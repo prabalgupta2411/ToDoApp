@@ -15,19 +15,32 @@ const app = express();
 // CORS configuration
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://todoapp-frontend-pied.vercel.app'
+  'https://todoapp-frontend-pied.vercel.app',
+  'https://todo-backend-xi-woad.vercel.app'
 ];
 
+// Handle preflight requests
+app.options('*', cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Main CORS middleware
 app.use(cors({
   origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
     }
-    return callback(null, true);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -57,7 +70,11 @@ app.use('/api/admin', adminRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!', error: err.message });
+  if (err.message === 'Not allowed by CORS') {
+    res.status(403).json({ message: 'Not allowed by CORS' });
+  } else {
+    res.status(500).json({ message: 'Something went wrong!', error: err.message });
+  }
 });
 
 // Connect to MongoDB
