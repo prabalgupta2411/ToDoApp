@@ -2,6 +2,10 @@
 
 A full-stack ToDo application built with React, Node.js, Express, and MongoDB. The application features user authentication, role-based access control, and a comprehensive admin dashboard.
 
+## Live Demo
+
+Check out the live application here: [ToDoApp Live Demo](https://todoapp-frontend-pied.vercel.app/)
+
 ## Features
 
 - User Authentication (Login/Register)
